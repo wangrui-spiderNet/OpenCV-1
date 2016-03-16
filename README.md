@@ -20,7 +20,7 @@ color2gray http://www.cs.northwestern.edu/~ago820/color2gray/color2gray.pdf
 2. 將 cp -a opencv/sdk/java $PROJ/libraries/opencv
 
 3. vi $PROJ/libraries/opencv/build.gradle
-=================== CUT HERE ====================================================================
+=================== CUT HERE ====================
 buildscript {
     repositories {
         jcenter()
@@ -49,13 +49,13 @@ android {
         }
     }
 }
-=================== CUT HERE ====================================================================
+=================== CUT HERE ====================
 
 4. add following into $PROJ/settings.gradle
 include ':libraries:opencv'
 
 5. 參考 following into $PROJ/app/build.gradle
-=================== CUT HERE ====================================================================
+=================== CUT HERE ===================
 import org.apache.tools.ant.taskdefs.condition.Os
 import com.android.build.gradle.tasks.NdkCompile
 
@@ -89,31 +89,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
-    /*
-    task ndkBuild(type: Exec) {
-        if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-            def ndkDir = System.getenv("ANDROID_NDK_ROOT")
-            commandLine 'cmd', '/C', "$ndkDir/ndk-build",
-                    'NDK_PROJECT_PATH=build',
-                    'APP_BUILD_SCRIPT=sc/main/jni/Android.mk',
-                    'NDK_APPLICATION_MK=src/main/jni/Application.mk',
-                    'NDK_APP_LIBS_OUT = src/main/jnilibs'
-
-        } else {
-            //commandLine "ndk-build", '-C', file('src/main').absolutePath
-            def ndkDir = System.getenv("NDKROOT")
-            commandLine "$ndkDir/ndk-build",
-                    'NDK_PROJECT_PATH=build',
-                    'APP_BUILD_SCRIPT=src/main/jni/Android.mk',
-                    'NDK_APPLICATION_MK=src/main/jni/Application.mk',
-                    'NDK_APP_LIBS_OUT = src/main/jnilibs'
-        }
-    }
-    tasks.withType(JavaCompile) {
-        compileTask -> compileTask.dependsOn ndkBuild
-    }
-    */
 }
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
