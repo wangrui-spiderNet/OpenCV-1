@@ -20,6 +20,7 @@ color2gray http://www.cs.northwestern.edu/~ago820/color2gray/color2gray.pdf
 2. 將 cp -a opencv/sdk/java $PROJ/libraries/opencv
 
 3. vi $PROJ/libraries/opencv/build.gradle
+
 =================== CUT HERE ====================
 buildscript {
     repositories {
@@ -49,12 +50,14 @@ android {
         }
     }
 }
+
 =================== CUT HERE ====================
 
 4. add following into $PROJ/settings.gradle
 include ':libraries:opencv'
 
 5. 參考 following into $PROJ/app/build.gradle
+
 =================== CUT HERE ===================
 import org.apache.tools.ant.taskdefs.condition.Os
 import com.android.build.gradle.tasks.NdkCompile
@@ -95,14 +98,17 @@ dependencies {
     compile 'com.android.support:appcompat-v7:22.0.0'
     compile project(':libraries:opencv')
 }
+=================== CUT HERE ===================
 
 6. 將 OpenCV sdk/native/libs/armeabi-v7a 複製到 $PROJ/app/src/main/jniLibs/
 
 怎樣略過 OpenCV Manager APK?
+
 1) http://superzoro.logdown.com/posts/2015/08/24/opencv-30-for-android-in-android-studio
 2) http://www.cnblogs.com/tail/p/4618790.html
 
 1. 註銷掉OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_3, this, mLoaderCallback); 在語句上邊直接設為SUCCESS
+
 public void onResume()
     {
         super.onResume();
