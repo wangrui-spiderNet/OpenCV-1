@@ -22,6 +22,7 @@ color2gray http://www.cs.northwestern.edu/~ago820/color2gray/color2gray.pdf
 3. vi $PROJ/libraries/opencv/build.gradle
 
 =================== CUT HERE ====================
+
 buildscript {
     repositories {
         jcenter()
@@ -98,6 +99,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:22.0.0'
     compile project(':libraries:opencv')
 }
+
 =================== CUT HERE ===================
 
 6. 將 OpenCV sdk/native/libs/armeabi-v7a 複製到 $PROJ/app/src/main/jniLibs/
