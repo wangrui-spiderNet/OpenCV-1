@@ -10,8 +10,9 @@ OpenCV 有可能因為引用的範例來自 opencv 2.x, 我盡可能採用的是
 <LI><A href="http://www.cs.northwestern.edu/~ago820/color2gray/color2gray.pdf">color2gray</a>
 </UL>
 <P>
-<H1>怎樣在 android studio 中使用 opencv-3.0?</H1>
-   http://stackoverflow.com/questions/17767557/how-to-use-opencv-in-android-studio-using-gradle-build-tool/22427267#22427267
+<H1>怎樣在 android studio 中使用 opencv-3.0?</H1><BR/>
+   <A href="http://stackoverflow.com/questions/17767557/how-to-use-opencv-in-android-studio-using-gradle-build-tool/22427267#22427267">
+怎樣在 android studio 中發展OpenCV 應用</a>
 <OL>
 <LI> 請直接下載 OpenCV-android-sdk<BR/>
 <UL>
@@ -59,7 +60,7 @@ android {
 <LI> add following into $PROJ/settings.gradle<BR/>
 include ':libraries:opencv'<BR/>
 PS: 這一步是相對應上面將 opencv 的原碼放的路徑，opencv sample project 都是直接放 $PROJ/ 下的
-<LI> 參考 following into $PROJ/app/build.gradle<BR/>
+<LI> 修改 $PROJ/app/build.gradle，這個當是最最重要的一個<BR/>
 =================== CUT HERE ===================<BR/>
 <PRE>
 import org.apache.tools.ant.taskdefs.condition.Os
@@ -68,32 +69,40 @@ import com.android.build.gradle.tasks.NdkCompile
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion "22.0.1"
+    compileSdkVersion 14
+    buildToolsVersion "23.0.2"
 
     defaultConfig {
-        applicationId "com.derzapp.myfacedetection"
-        minSdkVersion 10
+        applicationId "com.wade.myfacedetection" // 主要是要搭配自己的 package name 
+        minSdkVersion 14
         targetSdkVersion 22
-        versionCode 1
-        versionName "1.0"
-        ndk {moduleName "NativeCode"}
+        versionCode 111
+        versionName "1.1.2"
+        ndk {moduleName "detection_based_tracker"} // 這邊要搭配 jni/Android.mk 中的 LOCAL_MODULE, 但是實情可能只是標註而已
     }
 
     sourceSets.main {
-        jniLibs.srcDir 'src/main/libs' //set .so files location to libs
-        jni.srcDirs = [] //Disable automatic ndk-build call
+        jniLibs.srcDir 'src/main/libs' // 會把編譯出來的 JNI 整合進 apk 中
+        jni.srcDirs = [] // 抑制自動呼叫 ndk-build, 也就是只編譯我們要的路徑即可
     }
 
-    tasks.withType(NdkCompile) {
-        compileTask -> compileTask.enabled = false
-    }
-
-    buildTypes {
+    buildTypes { // 這邊是標準寫法，我沒改
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+
+    task ndkBuild(type: Exec) {
+        def ndkDir = android.ndkDirectory	// 取得 ndk-build 的目錄，請先安裝好, 在 local.properties 中設定 ndk.dir
+        commandLine "$ndkDir/ndk-build",	// 執行 ndk-build, 底下是參數	
+                'NDK_PROJECT_PATH=build',
+                'APP_BUILD_SCRIPT=src/main/jni/Android.mk',	// 會呼叫 jni/Android.mk, 請注意這個檔要能夠手動下 ndk-build 成功
+                'NDK_APPLICATION_MK=src/main/jni/Application.mk',
+                'NDK_APP_LIBS_OUT = src/main/libs'	// 會把編譯出來的 JNI 放在此目錄
+    }
+    tasks.withType(JavaCompile) {
+        compileTask -> compileTask.dependsOn ndkBuild	// 呼叫 task ndkBuild 
     }
 }
 dependencies {

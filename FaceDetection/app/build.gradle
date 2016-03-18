@@ -11,7 +11,7 @@ android {
         targetSdkVersion 22
         versionCode 111
         versionName "1.1.1"
-        ndk {moduleName "NativeCode"}
+        ndk {moduleName "detection_based_tracker"}
     }
 
     sourceSets.main {
