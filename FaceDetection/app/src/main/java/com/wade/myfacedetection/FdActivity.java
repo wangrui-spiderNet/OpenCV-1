@@ -60,41 +60,45 @@ public class FdActivity extends Activity  implements CvCameraViewListener2{
             MainActivity caller = new MainActivity();
 
             int[] rawResources = new int[]{
-                R.raw.haarcascade_frontalface_default,
-                R.raw.haarcascade_profileface,
-                R.raw.haarcascade_frontalface_alt_tree,
-                R.raw.haarcascade_frontalface_alt2,
-                R.raw.haarcascade_frontalface_alt,
-                R.raw.haarcascade_frontalcatface_extended,
-                R.raw.haarcascade_frontalcatface,
-                R.raw.haarcascade_upperbody,
-                R.raw.haarcascade_lowerbody,
-                R.raw.haarcascade_eye,
-                R.raw.haarcascade_eye_tree_eyeglasses,
-                R.raw.haarcascade_lefteye_2splits,
-                R.raw.haarcascade_righteye_2splits,
-                R.raw.haarcascade_russian_plate_number,
-                R.raw.haarcascade_smile,
-                R.raw.haarcascade_licence_plate_rus_16stages
+                    R.raw.lbpcascade_frontalface,
+                    R.raw.haarcascade_profileface,
+                    R.raw.haarcascade_frontalcatface_extended,
+                    R.raw.haarcascade_frontalcatface,
+                    R.raw.haarcascade_frontalface_alt2,
+                    R.raw.haarcascade_frontalface_alt_tree,
+                    R.raw.haarcascade_frontalface_alt,
+                    R.raw.haarcascade_frontalface_default,
+                    R.raw.haarcascade_lowerbody,
+                    R.raw.haarcascade_upperbody,
+                    R.raw.haarcascade_fullbody,
+                    R.raw.haarcascade_eye_tree_eyeglasses,
+                    R.raw.haarcascade_eye,
+                    R.raw.haarcascade_lefteye_2splits,
+                    R.raw.haarcascade_righteye_2splits,
+                    R.raw.haarcascade_licence_plate_rus_16stages,
+                    R.raw.haarcascade_russian_plate_number,
+                    R.raw.haarcascade_smile
             };
 
             String[] haarXML = new String[]{
-                "haarcascade_frontalface_default.xml",
-                "haarcascade_profileface.xml",
-                "haarcascade_frontalface_alt_tree.xml",
-                "haarcascade_frontalface_alt2.xml",
-                "haarcascade_frontalface_alt.xml",
-                "haarcascade_frontalcatface_extended.xml",
-                "haarcascade_frontalcatface.xml",
-                "haarcascade_upperbody.xml",
-                "haarcascade_lowerbody.xml",
-                "haarcascade_eye.xml",
-                "haarcascade_eye_tree_eyeglasses.xml",
-                "haarcascade_lefteye_2splits.xml",
-                "haarcascade_righteye_2splits.xml",
-                "haarcascade_russian_plate_number.xml",
-                "haarcascade_smile.xml",
-                "haarcascade_licence_plate_rus_16stages.xml"
+                    "lbpcascade_frontalface.xml",
+                    "haarcascade_profileface.xml",
+                    "haarcascade_frontalcatface_extended.xml",
+                    "haarcascade_frontalcatface.xml",
+                    "haarcascade_frontalface_alt2.xml",
+                    "haarcascade_frontalface_alt_tree.xml",
+                    "haarcascade_frontalface_alt.xml",
+                    "haarcascade_frontalface_default.xml",
+                    "haarcascade_lowerbody.xml",
+                    "haarcascade_upperbody.xml",
+                    "haarcascade_fullbody.xml",
+                    "haarcascade_eye_tree_eyeglasses.xml",
+                    "haarcascade_eye.xml",
+                    "haarcascade_lefteye_2splits.xml",
+                    "haarcascade_righteye_2splits.xml",
+                    "haarcascade_licence_plate_rus_16stages.xml",
+                    "haarcascade_russian_plate_number.xml",
+                    "haarcascade_smile.xml"
             };
             switch(status){
                 case LoaderCallbackInterface.SUCCESS:
@@ -232,7 +236,7 @@ public class FdActivity extends Activity  implements CvCameraViewListener2{
         for (int i = 0; i < facesArray.length; i++) {
             Imgproc.rectangle(mGray, facesArray[i].tl(), facesArray[i].br(), FACE_RECT_COLOR, 3);
         }
-        return mGray;
+        return mRgba;
     }
 
     private void setMinFaceSize(float faceSize){

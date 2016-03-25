@@ -5,6 +5,7 @@
     <string name="action_settings">設定</string>
     <string name="start">開始</string>
     <string name="hello_world">Hello, FaceDetection on Android</string>
+    <string name="lbFace">lbFace</string>
     <string name="ProfileFace">ProfileFace</string>
     <string name="AltTree">AltTree</string>
     <string name="Alt2">Alt2</string>

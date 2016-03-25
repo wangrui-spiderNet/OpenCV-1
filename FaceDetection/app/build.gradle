@@ -25,7 +25,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
     task ndkBuild(type: Exec) {
         def ndkDir = android.ndkDirectory
         commandLine "$ndkDir/ndk-build",
@@ -34,6 +33,15 @@ android {
                 'NDK_APPLICATION_MK=src/main/jni/Application.mk',
                 'NDK_APP_LIBS_OUT = src/main/libs'
     }
+    task cleanNative(type: Exec, description: 'Clean JNI object files') {
+        def ndkDir = android.ndkDirectory
+        commandLine "$ndkDir/ndk-build",
+                '-C', file('src/main/jni').absolutePath, // Change src/main/jni the relative path to your jni source
+                'clean'
+    }
+
+    clean.dependsOn 'cleanNative'
+
     tasks.withType(JavaCompile) {
         compileTask -> compileTask.dependsOn ndkBuild
     }
