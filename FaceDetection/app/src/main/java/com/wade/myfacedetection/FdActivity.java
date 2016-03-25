@@ -31,17 +31,11 @@ public class FdActivity extends Activity  implements CvCameraViewListener2{
     private static final String    TAG                     = "FaceDetect";
     private static final Scalar    FACE_RECT_COLOR         = new Scalar(0, 255, 0, 255);
     private static final Scalar    EYE_RECT_COLOR          = new Scalar(255, 0, 0, 255);
-    public static final int        JAVA_DETECTOR           = 0;
-    public static final int        NATIVE_DETECTOR         = 1;
 
     private Mat                    mRgba;
     private Mat                    mGray;
     private File                   mCascadeFile,mEyeFile;
     private CascadeClassifier      mFaceDetector, mEyeDetector;
-    private DetectionBasedTracker  mNativeDetector;
-
-    private int                    mDetectorType           = JAVA_DETECTOR;
-    private String[]               mDetectorName;
 
     private float                  mRelativeFaceSize       = 0.2f;
     private int                    mAbsoluteFaceSize       = 0;
@@ -104,13 +98,13 @@ public class FdActivity extends Activity  implements CvCameraViewListener2{
                 case LoaderCallbackInterface.SUCCESS:
                 {
                     Log.i(TAG, "OpenCV Loaded Successfully");
-                    System.loadLibrary("detection_based_tracker");
                     setMinFaceSize(0.2f);
 
                     try{
                         File cascadeDir = getDir("cascade", Context.MODE_PRIVATE);
                         InputStream is;
                         int mode = caller.getStartMode();
+                        Log.i(TAG, "OpenCV start mode " + mode);
                         is = getResources().openRawResource(rawResources[mode]);
                         mCascadeFile = new File(cascadeDir, haarXML[mode]);
                         FileOutputStream os = new FileOutputStream(mCascadeFile);
@@ -130,8 +124,6 @@ public class FdActivity extends Activity  implements CvCameraViewListener2{
                         } else
                             Log.i(TAG, "Loaded cascade classifier from " + mCascadeFile.getAbsolutePath());
 
-                        mNativeDetector = new DetectionBasedTracker(mCascadeFile.getAbsolutePath(), 0);
-
                         cascadeDir.delete();
                     }catch(IOException e){
                         e.printStackTrace();
@@ -150,9 +142,6 @@ public class FdActivity extends Activity  implements CvCameraViewListener2{
     };//BaseLoaderCallback
 
     public FdActivity(){
-        mDetectorName = new String[2];
-        mDetectorName[JAVA_DETECTOR] = "JAVA";
-        mDetectorName[NATIVE_DETECTOR] = "NATIVE (tracking)";
     }
 
     /** Called when the activity is first created. **/
@@ -178,13 +167,6 @@ public class FdActivity extends Activity  implements CvCameraViewListener2{
     @Override
     public void onResume(){
         super.onResume();
-/*
-        if (!OpenCVLoader.initDebug()) {
-            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_0_0, this, mLoaderCallback);
-        } else {
-            mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
-        }
-*/
         mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
     }
 
@@ -213,20 +195,14 @@ public class FdActivity extends Activity  implements CvCameraViewListener2{
             if (Math.round(height * mRelativeFaceSize) > 0) {
                 mAbsoluteFaceSize = Math.round(height * mRelativeFaceSize);
             }
-            mNativeDetector.setMinFaceSize(mAbsoluteFaceSize);
         }
 
         MatOfRect faces = new MatOfRect();
         MatOfRect eyes  = new MatOfRect();
 
-        if (mDetectorType == JAVA_DETECTOR) {
-            if (mFaceDetector != null)
-                mFaceDetector.detectMultiScale(mGray, faces, 1.3, 5, 3,
-                        new Size(mAbsoluteFaceSize, mAbsoluteFaceSize), new Size());
-        }
-        else if (mDetectorType == NATIVE_DETECTOR) {
-            if (mNativeDetector != null)
-                mNativeDetector.detect(mGray, faces);
+        if (mFaceDetector != null) {
+            mFaceDetector.detectMultiScale(mGray, faces, 1.3, 5, 3,
+                    new Size(mAbsoluteFaceSize, mAbsoluteFaceSize), new Size());
         }
         else {
             Log.e(TAG, "Detection method is not selected!");
@@ -242,19 +218,5 @@ public class FdActivity extends Activity  implements CvCameraViewListener2{
     private void setMinFaceSize(float faceSize){
         mRelativeFaceSize = faceSize;
         mAbsoluteFaceSize = 0;
-    }
-
-    private void setDetectorType(int type) {
-        if (mDetectorType != type) {
-            mDetectorType = type;
-
-            if (type == NATIVE_DETECTOR) {
-                Log.i(TAG, "Detection Based Tracker enabled");
-                mNativeDetector.start();
-            } else {
-                Log.i(TAG, "Cascade detector enabled");
-                mNativeDetector.stop();
-            }
-        }
     }
 }

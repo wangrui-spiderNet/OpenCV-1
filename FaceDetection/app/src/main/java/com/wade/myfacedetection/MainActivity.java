@@ -3,13 +3,15 @@ package com.wade.myfacedetection;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 
 public class MainActivity extends Activity {
+    private static final String    TAG                     = "FaceDetect";
     public static Activity  mMainActivity;
-    public int startMode = 0;
+    public static int startMode = 0;
     private MenuItem    mItemStart; // default
     private MenuItem    mItemLbFace;
     private MenuItem    mItemProfileFace;
@@ -86,6 +88,7 @@ public class MainActivity extends Activity {
         else if (item == mItemPlate)        { startMode = 15; }
         else if (item == mItemRussian)      { startMode = 16; }
         else if (item == mItemSmile)        { startMode = 17; }
+        Log.d(TAG, "Options selected "+startMode + ": "+item.toString());
         Intent intent = new Intent(MainActivity.this, FdActivity.class);
         startActivity(intent);
         return true;

@@ -11,12 +11,7 @@ android {
         targetSdkVersion 22
         versionCode 111
         versionName "1.1.1"
-        ndk {moduleName "detection_based_tracker"}
-    }
-
-    sourceSets.main {
-        jniLibs.srcDir 'src/main/libs' //set .so files location to libs
-        jni.srcDirs = [] //Disable automatic ndk-build call
+//        ndk {moduleName "detection_based_tracker"}
     }
 
     buildTypes {
@@ -24,6 +19,11 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+/*
+    sourceSets.main {
+        jniLibs.srcDir 'src/main/libs' //set .so files location to libs
+        jni.srcDirs = [] //Disable automatic ndk-build call
     }
     task ndkBuild(type: Exec) {
         def ndkDir = android.ndkDirectory
@@ -39,12 +39,11 @@ android {
                 '-C', file('src/main/jni').absolutePath, // Change src/main/jni the relative path to your jni source
                 'clean'
     }
-
     clean.dependsOn 'cleanNative'
-
     tasks.withType(JavaCompile) {
         compileTask -> compileTask.dependsOn ndkBuild
     }
+*/
 }
 
 dependencies {
