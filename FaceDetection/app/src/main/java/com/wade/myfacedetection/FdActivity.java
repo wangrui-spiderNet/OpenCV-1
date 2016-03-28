@@ -14,6 +14,7 @@ import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
+import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
@@ -24,6 +25,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import static java.lang.Math.round;
 
 
 public class FdActivity extends Activity  implements CvCameraViewListener2{
@@ -119,8 +122,23 @@ public class FdActivity extends Activity  implements CvCameraViewListener2{
 
                         mFaceDetector = new CascadeClassifier(mCascadeFile.getAbsolutePath());
                         if (mFaceDetector.empty()) {
-                            Log.e(TAG, "Failed to load cascade classifier");
+                            Log.e(TAG, "Failed to load cascade classifier " + mCascadeFile.toString());
                             mFaceDetector = null;
+                        } else
+                            Log.i(TAG, "Loaded cascade classifier from " + mCascadeFile.getAbsolutePath());
+
+                        is = getResources().openRawResource(rawResources[11]); // see mItemEye in MainActivity
+                        mCascadeFile = new File(cascadeDir, haarXML[11]);
+                        os = new FileOutputStream(mCascadeFile);
+                        while ((bytesRead = is.read(buffer)) != -1) {
+                            os.write(buffer, 0, bytesRead);
+                        }
+                        is.close();
+                        os.close();
+                        mEyeDetector = new CascadeClassifier(mCascadeFile.getAbsolutePath());
+                        if (mEyeDetector.empty()) {
+                            Log.e(TAG, "Failed to load cascade classifier " + mCascadeFile.toString());
+                            mEyeDetector = null;
                         } else
                             Log.i(TAG, "Loaded cascade classifier from " + mCascadeFile.getAbsolutePath());
 
@@ -192,8 +210,8 @@ public class FdActivity extends Activity  implements CvCameraViewListener2{
 
         if (mAbsoluteFaceSize == 0) {
             int height = mGray.rows();
-            if (Math.round(height * mRelativeFaceSize) > 0) {
-                mAbsoluteFaceSize = Math.round(height * mRelativeFaceSize);
+            if (round(height * mRelativeFaceSize) > 0) {
+                mAbsoluteFaceSize = round(height * mRelativeFaceSize);
             }
         }
 
@@ -203,14 +221,28 @@ public class FdActivity extends Activity  implements CvCameraViewListener2{
         if (mFaceDetector != null) {
             mFaceDetector.detectMultiScale(mGray, faces, 1.3, 5, 3,
                     new Size(mAbsoluteFaceSize, mAbsoluteFaceSize), new Size());
+
+            if (!faces.empty()) {
+                Rect[] facesArray = faces.toArray();
+                Log.d(TAG, "Faces detected: " + facesArray.length);
+                for (int i = 0; i < facesArray.length; i++) {
+                    Point center = new Point((facesArray[i].x + facesArray[i].width/2), (facesArray[i].y + facesArray[i].height/2));
+                    Imgproc.ellipse(mRgba, center, new Size(facesArray[i].width/2, facesArray[i].height/2),
+                            0, 0, 360, new Scalar(255,0,255), 4, 8, 0);
+                    Mat faceROI = new Mat(mGray, facesArray[i]);
+                    mEyeDetector.detectMultiScale(faceROI, eyes);
+                    Rect[] eyesArray = eyes.toArray();
+                    for (int j=0; j<eyesArray.length; j++) {
+                        Point eyeCenter = new Point(facesArray[i].x + eyesArray[j].x + eyesArray[j].width/2,
+                                facesArray[i].y + eyesArray[j].y + eyesArray[j].height/2);
+                        int radius = (int) round((eyesArray[j].width + eyesArray[j].height)*0.25);
+                        Imgproc.circle(mRgba, eyeCenter, radius, new Scalar(255,0,0), 4, 8, 0);
+                    }
+                }
+            }
         }
         else {
             Log.e(TAG, "Detection method is not selected!");
-        }
-
-        Rect[] facesArray = faces.toArray();
-        for (int i = 0; i < facesArray.length; i++) {
-            Imgproc.rectangle(mGray, facesArray[i].tl(), facesArray[i].br(), FACE_RECT_COLOR, 3);
         }
         return mRgba;
     }

@@ -1,6 +1,9 @@
 import com.android.build.gradle.tasks.NdkCompile
 apply plugin: 'com.android.application'
 
+// If you want compile "jni", please remove comment below
+// 如果程式碼需要用到 JNI 的話，例如 OpenCV 範例程式中就有用到，那麼
+// 就將底下的註解都拿掉
 android {
     compileSdkVersion 14
     buildToolsVersion "23.0.2"
@@ -9,8 +12,8 @@ android {
         applicationId "com.wade.myfacedetection"
         minSdkVersion 14
         targetSdkVersion 22
-        versionCode 111
-        versionName "1.1.1"
+        versionCode 120
+        versionName "1.2.0"
 //        ndk {moduleName "detection_based_tracker"}
     }
 
@@ -49,5 +52,4 @@ android {
 dependencies {
     compile fileTree(dir: 'libs')
     compile project(':libraries:opencv')
-    // compile 'org.bytedeco.javacpp-presets:opencv:3.0.0-1.1'
 }

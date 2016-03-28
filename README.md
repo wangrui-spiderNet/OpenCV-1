@@ -1,6 +1,6 @@
 Contact: wade.fs@gmail.com <BR/>
-本範例一律採用 Android Studio 最新版編譯，目前是 2.0 preview 4 build 143.2489090 <BR/>
-系統採用 Ubuntu 15.04, 其他請見 http://source.android.com/source/initializing.html <BR/>
+本範例一律採用 Android Studio 最新版編譯，目前是 2.1 preview3, build 143.2682553 <BR/>
+系統採用 Ubuntu 15.10, 其他請見 http://source.android.com/source/initializing.html <BR/>
 OpenCV 有可能因為引用的範例來自 opencv 2.x, 我盡可能採用的是 OpenCV 3.0.0 <BR/>
 <P>
 <UL>
@@ -8,6 +8,7 @@ OpenCV 有可能因為引用的範例來自 opencv 2.x, 我盡可能採用的是
 <LI><A href="https://www.youtube.com/watch?v=nmDiZGx5mqU">教學@Youtube</a> <br />
 <LI><A href="https://github.com/openalpr/openalpr">Open Alpr</a> <br />
 <LI><A href="http://www.cs.northwestern.edu/~ago820/color2gray/color2gray.pdf">color2gray</a>
+<LI><A href="http://docs.opencv.org/3.1.0/db/d28/tutorial_cascade_classifier.html">OpenCV-3.1.0 Face Detection</a>
 </UL>
 <P>
 <H1>怎樣在 android studio 中使用 opencv-3.0?</H1><BR/>
@@ -21,21 +22,13 @@ OpenCV 有可能因為引用的範例來自 opencv 2.x, 我盡可能採用的是
 </UL>
   底下稱其解壓縮根目錄為 opencv<BR/>
 
-<LI> 將 cp -a opencv/sdk/java $PROJ/libraries/opencv
+<LI> 將前面下載的 OpenCV java code 複製到專案中:<Br/>
+ $ mkdir $PROJ/libraries<br/>
+ $ cp -a opencv/sdk/java $PROJ/libraries/opencv
 
 <LI> vi $PROJ/libraries/opencv/build.gradle
 =================== CUT HERE ====================
 <PRE>
-buildscript {
-    repositories {
-        jcenter()
-    }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.0-alpha3'
-    }
-}
-
 apply plugin: 'com.android.library'
 
 android {
@@ -59,60 +52,70 @@ android {
 
 <LI> add following into $PROJ/settings.gradle<BR/>
 include ':libraries:opencv'<BR/>
-PS: 這一步是相對應上面將 opencv 的原碼放的路徑，opencv sample project 都是直接放 $PROJ/ 下的
+PS: 這一步是相對應上面複製 opencv 原碼放的路徑，當然專案的源碼直接放 $PROJ/ 下
 <LI> 修改 $PROJ/app/build.gradle，這個當是最最重要的一個<BR/>
 =================== CUT HERE ===================<BR/>
 <PRE>
-import org.apache.tools.ant.taskdefs.condition.Os
 import com.android.build.gradle.tasks.NdkCompile
-
 apply plugin: 'com.android.application'
 
+// If you want compile "jni", please remove comment below
+// 如果程式碼需要用到 JNI 的話，例如 OpenCV 範例程式中就有用到，那麼
+// 就將底下的註解都拿掉
 android {
     compileSdkVersion 14
     buildToolsVersion "23.0.2"
 
     defaultConfig {
-        applicationId "com.wade.myfacedetection" // 主要是要搭配自己的 package name 
+        applicationId "com.wade.myfacedetection"
         minSdkVersion 14
         targetSdkVersion 22
-        versionCode 111
-        versionName "1.1.2"
-        ndk {moduleName "detection_based_tracker"} // 這邊要搭配 jni/Android.mk 中的 LOCAL_MODULE, 但是實情可能只是標註而已
+        versionCode 120
+        versionName "1.2.0"
+//        ndk {moduleName "detection_based_tracker"}
     }
 
-    sourceSets.main {
-        jniLibs.srcDir 'src/main/libs' // 會把編譯出來的 JNI 整合進 apk 中
-        jni.srcDirs = [] // 抑制自動呼叫 ndk-build, 也就是只編譯我們要的路徑即可
-    }
-
-    buildTypes { // 這邊是標準寫法，我沒改
+    buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
+/*
+    sourceSets.main {
+        jniLibs.srcDir 'src/main/libs' //set .so files location to libs
+        jni.srcDirs = [] //Disable automatic ndk-build call
+    }
     task ndkBuild(type: Exec) {
-        def ndkDir = android.ndkDirectory	// 取得 ndk-build 的目錄，請先安裝好, 在 local.properties 中設定 ndk.dir
-        commandLine "$ndkDir/ndk-build",	// 執行 ndk-build, 底下是參數	
+        def ndkDir = android.ndkDirectory
+        commandLine "$ndkDir/ndk-build",
                 'NDK_PROJECT_PATH=build',
-                'APP_BUILD_SCRIPT=src/main/jni/Android.mk',	// 會呼叫 jni/Android.mk, 請注意這個檔要能夠手動下 ndk-build 成功
+                'APP_BUILD_SCRIPT=src/main/jni/Android.mk',
                 'NDK_APPLICATION_MK=src/main/jni/Application.mk',
-                'NDK_APP_LIBS_OUT = src/main/libs'	// 會把編譯出來的 JNI 放在此目錄
+                'NDK_APP_LIBS_OUT = src/main/libs'
     }
+    task cleanNative(type: Exec, description: 'Clean JNI object files') {
+        def ndkDir = android.ndkDirectory
+        commandLine "$ndkDir/ndk-build",
+                '-C', file('src/main/jni').absolutePath, // Change src/main/jni the relative path to your jni source
+                'clean'
+    }
+    clean.dependsOn 'cleanNative'
     tasks.withType(JavaCompile) {
-        compileTask -> compileTask.dependsOn ndkBuild	// 呼叫 task ndkBuild 
+        compileTask -> compileTask.dependsOn ndkBuild
     }
+*/
 }
+
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:22.0.0'
+    compile fileTree(dir: 'libs')
     compile project(':libraries:opencv')
 }
 </PRE><BR/>
 =================== CUT HERE ===================<BR/>
-
+本範例已經將原本 OpenCV sample code 中的 Native JNI 拿掉所以不需要 JNI,<Br/>
+ 需要的話請按照說明將上面的註解拿掉。<BR/>
+如果要編譯 Native JNI 的話就需要再進行下面的步驟:<Br/>
 <LI> 將 OpenCV sdk/native/libs/armeabi-v7a 複製到 $PROJ/app/src/main/jniLibs/<BR/>
 </OL>
 
