@@ -4,6 +4,7 @@ Contact: wade.fs@gmail.com <BR/>
 OpenCV 有可能因為引用的範例來自 opencv 2.x, 我盡可能採用的是 OpenCV 3.0.0 <BR/>
 <P>
 <UL>
+<LI><a href="https://github.com/egomez99/OPENCV_FaceDetection">本範例原始參考專案</a> <br />
 <LI><a href="https://github.com/tesseract-ocr/tesseract">tesseract</a> <br />
 <LI><A href="https://www.youtube.com/watch?v=nmDiZGx5mqU">教學@Youtube</a> <br />
 <LI><A href="https://github.com/openalpr/openalpr">Open Alpr</a> <br />
